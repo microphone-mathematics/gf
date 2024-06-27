@@ -29,6 +29,9 @@ func main() {
 	var dumpMode bool
 	flag.BoolVar(&dumpMode, "dump", false, "prints the grep command rather than executing it")
 
+	var colorMode bool
+	flag.BoolVar(&colorMode, "color", false, "use --color for grep")
+
 	flag.Parse()
 
 	if listMode {
@@ -104,9 +107,17 @@ func main() {
 		}
 
 		if stdinIsPipe() {
-			cmd = exec.Command(operator, pat.Flags, pat.Pattern)
+			if colorMode {
+				cmd = exec.Command(operator, "--color", pat.Flags, pat.Pattern)
+			} else {
+				cmd = exec.Command(operator, pat.Flags, pat.Pattern)
+			}
 		} else {
-			cmd = exec.Command(operator, pat.Flags, pat.Pattern, files)
+			if colorMode {
+				cmd = exec.Command(operator, "--color", pat.Flags, pat.Pattern, files)
+			} else {
+				cmd = exec.Command(operator, pat.Flags, pat.Pattern, files)
+			}
 		}
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
